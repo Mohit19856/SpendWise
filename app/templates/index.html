@@ -1,0 +1,162 @@
+{# Landing page - visible to everyone. #}
+{% extends "base.html" %}
+
+{% block title %}{{ APP_NAME }} - Track every rupee, effortlessly{% endblock %}
+{% block body_class %}public-body{% endblock %}
+
+{% block body %}
+{% include "partials/public_nav.html" %}
+
+<main>
+  <div class="container pt-4">
+    {% include "partials/flashes.html" %}
+  </div>
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="badge rounded-pill hero-badge mb-3">
+            <i class="bi bi-mortarboard me-1"></i> BCA Capstone Project
+          </span>
+          <h1 class="display-4 fw-bold mb-3">
+            Track every rupee.<br>
+            <span class="text-gradient">Understand your money.</span>
+          </h1>
+          <p class="lead text-muted mb-4">
+            SpendWise is a simple, secure personal expense tracker. Record your income and
+            expenses in INR, see where your money goes with interactive charts, and take
+            better decisions every month.
+          </p>
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            {% if current_user.is_authenticated %}
+              <a href="{{ url_for('dashboard.home') }}" class="btn btn-brand btn-lg px-4">
+                <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+              </a>
+            {% else %}
+              <a href="{{ url_for('auth.register') }}" class="btn btn-brand btn-lg px-4">
+                <i class="bi bi-person-plus me-2"></i>Create Free Account
+              </a>
+              <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+              </a>
+            {% endif %}
+          </div>
+          <ul class="list-inline hero-points mb-0">
+            <li class="list-inline-item"><i class="bi bi-shield-check text-success"></i> Hashed passwords</li>
+            <li class="list-inline-item"><i class="bi bi-graph-up-arrow text-primary"></i> Live charts</li>
+            <li class="list-inline-item"><i class="bi bi-currency-rupee text-warning"></i> INR ready</li>
+          </ul>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="hero-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-muted small">Dashboard preview</span>
+              <span class="badge bg-success-subtle text-success-emphasis">Balance</span>
+            </div>
+            <div class="hero-balance mb-3">₹42,350.00</div>
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="mini-stat income">
+                  <span class="label">Income</span>
+                  <span class="value">₹60,000.00</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mini-stat expense">
+                  <span class="label">Expenses</span>
+                  <span class="value">₹17,650.00</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>Food &amp; Groceries</span><span>32%</span>
+              </div>
+              <div class="progress mb-2" style="height:8px;">
+                <div class="progress-bar bg-primary" style="width:32%"></div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>Rent</span><span>45%</span>
+              </div>
+              <div class="progress mb-2" style="height:8px;">
+                <div class="progress-bar bg-info" style="width:45%"></div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>Transport</span><span>23%</span>
+              </div>
+              <div class="progress" style="height:8px;">
+                <div class="progress-bar bg-warning" style="width:23%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 bg-white">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold">Everything you need to manage your money</h2>
+        <p class="text-muted">A complete expense tracker, built as a college capstone project.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="feature-card h-100">
+            <span class="feature-icon bg-primary-subtle text-primary"><i class="bi bi-pie-chart"></i></span>
+            <h3 class="h6 fw-semibold mt-3">Smart Dashboard</h3>
+            <p class="text-muted small mb-0">Income, expenses and balance calculated instantly from your own records.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="feature-card h-100">
+            <span class="feature-icon bg-success-subtle text-success"><i class="bi bi-bar-chart-line"></i></span>
+            <h3 class="h6 fw-semibold mt-3">Interactive Charts</h3>
+            <p class="text-muted small mb-0">Monthly income vs expense and category-wise breakdown powered by Chart.js.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="feature-card h-100">
+            <span class="feature-icon bg-warning-subtle text-warning"><i class="bi bi-funnel"></i></span>
+            <h3 class="h6 fw-semibold mt-3">Powerful Filters</h3>
+            <p class="text-muted small mb-0">Filter by type, category and date range, or search any description.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="feature-card h-100">
+            <span class="feature-icon bg-danger-subtle text-danger"><i class="bi bi-shield-lock"></i></span>
+            <h3 class="h6 fw-semibold mt-3">Secure by Design</h3>
+            <p class="text-muted small mb-0">Password hashing, CSRF protection and strict per-user data isolation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 how-section">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+          <h2 class="fw-bold mb-3">Get started in three simple steps</h2>
+          <p class="text-muted">No installation for the user, no bank connection required. You stay in control of your data.</p>
+        </div>
+        <div class="col-lg-7">
+          <ol class="step-list">
+            <li><span class="step-number">1</span><div><strong>Create your account</strong><p class="text-muted small mb-0">Register with your name, email and a strong password.</p></div></li>
+            <li><span class="step-number">2</span><div><strong>Add your income &amp; expenses</strong><p class="text-muted small mb-0">Choose a category, enter the amount in INR and save.</p></div></li>
+            <li><span class="step-number">3</span><div><strong>Review your dashboard</strong><p class="text-muted small mb-0">Spot spending patterns and track your monthly savings.</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="public-footer">
+  <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+    <span>&copy; {{ APP_NAME }} &middot; {{ APP_TAGLINE }}</span>
+    <span class="text-muted">Built with Flask &middot; SQLite &middot; Bootstrap 5 &middot; Chart.js</span>
+  </div>
+</footer>
+{% endblock %}

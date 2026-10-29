@@ -1,0 +1,465 @@
+/* ===========================================================================
+   SpendWise - custom stylesheet (used on top of Bootstrap 5)
+   Sections:
+     1. Design tokens
+     2. Global helpers
+     3. Sidebar + app shell
+     4. Cards, stats and tables
+     5. Charts and legends
+     6. Forms and empty states
+     7. Public pages (landing / auth)
+     8. Error pages
+     9. Responsive rules
+   =========================================================================== */
+
+/* ------------------------------ 1. Design tokens ------------------------- */
+:root {
+  --sw-primary: #4f46e5;
+  --sw-primary-dark: #4338ca;
+  --sw-primary-light: #eef2ff;
+  --sw-info: #0ea5e9;
+  --sw-success: #10b981;
+  --sw-danger: #ef4444;
+  --sw-warning: #f59e0b;
+  --sw-dark: #0f172a;
+  --sw-slate-700: #334155;
+  --sw-slate-500: #64748b;
+  --sw-slate-200: #e2e8f0;
+  --sw-slate-100: #f1f5f9;
+  --sw-page-bg: #f4f6fb;
+  --sw-sidebar-bg: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
+  --sw-radius: 14px;
+  --sw-radius-sm: 10px;
+  --sw-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+  --sw-shadow-lg: 0 18px 48px rgba(15, 23, 42, 0.12);
+  --sw-sidebar-width: 268px;
+}
+
+/* ------------------------------ 2. Global helpers ------------------------ */
+body {
+  font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+  background-color: var(--sw-page-bg);
+  color: var(--sw-dark);
+}
+
+.btn-brand {
+  background: linear-gradient(135deg, var(--sw-primary) 0%, #6366f1 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: var(--sw-radius-sm);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+}
+.btn-brand:hover, .btn-brand:focus {
+  background: linear-gradient(135deg, var(--sw-primary-dark) 0%, var(--sw-primary) 100%);
+  color: #fff;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--sw-radius-sm);
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--sw-primary) 0%, var(--sw-info) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.flash-stack { margin-bottom: 1rem; }
+.flash-stack .alert { border: none; border-radius: var(--sw-radius-sm); }
+
+.card {
+  border-radius: var(--sw-radius);
+}
+.card-header { border-top-left-radius: var(--sw-radius) !important; border-top-right-radius: var(--sw-radius) !important; }
+
+/* ------------------------------ 3. Sidebar + app shell ------------------- */
+.app-body { background-color: var(--sw-page-bg); }
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sw-sidebar-width);
+  background: var(--sw-sidebar-bg);
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1rem;
+  z-index: 1040;
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+}
+
+.sidebar-brand { padding: 0.25rem 0.5rem 1.25rem; }
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #fff;
+}
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--sw-primary) 0%, var(--sw-info) 100%);
+  color: #fff;
+  font-size: 1.25rem;
+  flex: 0 0 auto;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-text strong { font-size: 1.1rem; letter-spacing: 0.2px; }
+.brand-text small { font-size: 0.7rem; color: #94a3b8; }
+
+.sidebar-nav { gap: 0.15rem; }
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #cbd5e1;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--sw-radius-sm);
+  font-size: 0.94rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-nav .nav-link i { font-size: 1.05rem; width: 1.25rem; text-align: center; }
+.sidebar-nav .nav-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.sidebar-nav .nav-link.active {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.9) 0%, rgba(99, 102, 241, 0.9) 100%);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.35);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-user { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sw-info) 0%, var(--sw-primary) 100%);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+.sidebar-user-info { display: flex; flex-direction: column; overflow: hidden; }
+.sidebar-user-info .name { color: #fff; font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-info .email { color: #94a3b8; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 1030;
+  display: none;
+}
+.sidebar-backdrop.show { display: block; }
+
+.app-main {
+  margin-left: var(--sw-sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: #fff;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--sw-slate-200);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+.topbar-title { flex: 1 1 auto; min-width: 0; }
+.topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.app-content { padding: 1.5rem; flex: 1 1 auto; }
+.app-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--sw-slate-200);
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--sw-slate-500);
+}
+
+/* ------------------------------ 4. Cards, stats and tables --------------- */
+.stat-card {
+  background: #fff;
+  border-radius: var(--sw-radius);
+  padding: 1.25rem;
+  box-shadow: var(--sw-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--sw-shadow-lg); }
+.stat-card .stat-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.35rem;
+}
+.stat-card .stat-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--sw-slate-500); font-weight: 600; }
+.stat-card .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-card .stat-foot { font-size: 0.78rem; color: var(--sw-slate-500); }
+
+.stat-card.stat-balance {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #0ea5e9 100%);
+  color: #fff;
+  border: none;
+}
+.stat-card.stat-balance .stat-icon { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.stat-card.stat-balance .stat-label,
+.stat-card.stat-balance .stat-foot { color: rgba(255, 255, 255, 0.85); }
+
+.table > :not(caption) > * > * { padding: 0.75rem 0.9rem; }
+.table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sw-slate-500);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.insight-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--sw-slate-200);
+  font-size: 0.88rem;
+}
+.insight-list li:last-child { border-bottom: none; }
+.insight-list li span { color: var(--sw-slate-500); flex: 1 1 auto; }
+.insight-list li strong { text-align: right; }
+
+/* ------------------------------ 5. Charts and legends -------------------- */
+.chart-box { position: relative; height: 300px; }
+.chart-box-sm { height: 230px; }
+.chart-placeholder {
+  height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px dashed var(--sw-slate-200);
+  border-radius: var(--sw-radius-sm);
+  color: var(--sw-slate-500);
+}
+.chart-placeholder i { font-size: 2rem; opacity: 0.5; }
+
+.legend-list { list-style: none; padding: 0; margin: 0; }
+.legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  font-size: 0.86rem;
+  border-bottom: 1px dashed var(--sw-slate-200);
+}
+.legend-list li:last-child { border-bottom: none; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.legend-name { flex: 1 1 auto; }
+.legend-value { font-weight: 600; }
+.legend-percent { color: var(--sw-slate-500); min-width: 48px; text-align: right; font-size: 0.78rem; }
+
+/* ------------------------------ 6. Forms and empty states ---------------- */
+.form-label { font-size: 0.88rem; }
+.form-control, .form-select { border-radius: var(--sw-radius-sm); padding: 0.6rem 0.85rem; }
+.input-group-text { border-radius: var(--sw-radius-sm) 0 0 var(--sw-radius-sm); background: var(--sw-slate-100); }
+.form-control:focus, .form-select:focus {
+  border-color: var(--sw-primary);
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
+}
+
+.empty-state { background: #fff; }
+.empty-icon {
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--sw-primary);
+  background: var(--sw-primary-light);
+}
+
+.tip-list { padding-left: 1.1rem; font-size: 0.88rem; color: var(--sw-slate-700); }
+.tip-list li { margin-bottom: 0.5rem; }
+.ownership-list li { display: flex; gap: 0.5rem; padding: 0.3rem 0; }
+
+.profile-avatar {
+  width: 84px; height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sw-primary) 0%, var(--sw-info) 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+.profile-stat { display: flex; flex-direction: column; }
+.profile-stat .value { font-weight: 700; font-size: 1.05rem; }
+.profile-stat .label { font-size: 0.75rem; color: var(--sw-slate-500); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ------------------------------ 7. Public pages -------------------------- */
+.public-body { background: #fff; }
+.public-navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--sw-slate-200); }
+.public-navbar .nav-link { color: var(--sw-slate-700); font-weight: 500; }
+
+.hero-section {
+  padding: 4.5rem 0 4rem;
+  background:
+    radial-gradient(900px 420px at 12% 0%, rgba(79, 70, 229, 0.12), transparent 65%),
+    radial-gradient(700px 380px at 92% 20%, rgba(14, 165, 233, 0.12), transparent 60%);
+}
+.hero-badge { background: var(--sw-primary-light); color: var(--sw-primary-dark); font-weight: 600; padding: 0.5rem 0.9rem; }
+.hero-points li { margin-right: 1.25rem; font-size: 0.9rem; color: var(--sw-slate-700); }
+
+.hero-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: var(--sw-shadow-lg);
+  border: 1px solid var(--sw-slate-200);
+}
+.hero-balance { font-size: 2.2rem; font-weight: 700; color: var(--sw-dark); }
+.mini-stat {
+  border-radius: var(--sw-radius-sm);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.mini-stat.income { background: rgba(16, 185, 129, 0.1); }
+.mini-stat.expense { background: rgba(239, 68, 68, 0.1); }
+.mini-stat .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--sw-slate-500); font-weight: 600; }
+.mini-stat .value { font-weight: 700; }
+.mini-stat.income .value { color: #047857; }
+.mini-stat.expense .value { color: #b91c1c; }
+
+.feature-card {
+  background: #fff;
+  border: 1px solid var(--sw-slate-200);
+  border-radius: var(--sw-radius);
+  padding: 1.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.feature-card:hover { transform: translateY(-3px); box-shadow: var(--sw-shadow); }
+.feature-icon {
+  width: 50px; height: 50px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.how-section { background: var(--sw-page-bg); }
+.step-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
+.step-list li {
+  display: flex;
+  gap: 1rem;
+  background: #fff;
+  border-radius: var(--sw-radius);
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--sw-slate-200);
+}
+.step-number {
+  width: 36px; height: 36px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--sw-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.public-footer { border-top: 1px solid var(--sw-slate-200); padding: 1.5rem 0; font-size: 0.85rem; color: var(--sw-slate-500); background: #fff; }
+
+.auth-card { border-radius: 20px; }
+.auth-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--sw-primary-light);
+  color: var(--sw-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+}
+
+/* ------------------------------ 8. Error pages --------------------------- */
+.error-body { background: var(--sw-page-bg); }
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.error-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: var(--sw-shadow-lg);
+  padding: 2.5rem 2rem;
+  max-width: 560px;
+  text-align: center;
+  border: 1px solid var(--sw-slate-200);
+}
+.error-code { font-size: 4.5rem; font-weight: 800; line-height: 1; letter-spacing: -2px; }
+
+/* ------------------------------ 9. Responsive ---------------------------- */
+@media (max-width: 991.98px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .app-main { margin-left: 0; }
+  .app-content { padding: 1rem; }
+  .topbar { padding: 0.75rem 1rem; }
+  .hero-section { padding: 3rem 0; }
+  .hero-balance { font-size: 1.8rem; }
+}
+
+@media (max-width: 575.98px) {
+  .stat-card .stat-value { font-size: 1.3rem; }
+  .chart-box { height: 250px; }
+  .app-footer { flex-direction: column; }
+}
+
+@media print {
+  .sidebar, .topbar, .app-footer, .btn { display: none !important; }
+  .app-main { margin-left: 0; }
+  body { background: #fff; }
+}

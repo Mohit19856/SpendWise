@@ -1,0 +1,6 @@
+# SpendWise - production (Linux / AWS EC2) only dependencies.
+# Gunicorn does NOT run on Windows, so it is kept separate from requirements.txt.
+# On the EC2 server run:  pip install -r requirements.txt -r requirements-prod.txt
+
+-r requirements.txt
+gunicorn==23.0.0

@@ -1,0 +1,106 @@
+{% extends "base_app.html" %}
+{% from "partials/field.html" import render_field with context %}
+
+{% block title %}My Profile - {{ APP_NAME }}{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block page_subtitle %}Your account details and security settings.{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body text-center">
+        <div class="profile-avatar mx-auto mb-3">{{ current_user.display_name()[0]|upper }}</div>
+        <h2 class="h5 fw-semibold mb-1">{{ current_user.name }}</h2>
+        <p class="text-muted small mb-3">{{ current_user.email }}</p>
+        <span class="badge bg-primary-subtle text-primary-emphasis">
+          Member since {{ current_user.created_at.strftime('%b %Y') }}
+        </span>
+
+        <hr class="my-4">
+
+        <div class="row text-center g-3">
+          <div class="col-6">
+            <div class="profile-stat">
+              <span class="value">{{ transaction_count }}</span>
+              <span class="label">Transactions</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="profile-stat">
+              <span class="value">{{ summary.balance | inr }}</span>
+              <span class="label">Balance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h3 class="h6 fw-semibold mb-0">Account summary</h3>
+      </div>
+      <div class="card-body">
+        <ul class="insight-list list-unstyled mb-3">
+          <li><i class="bi bi-arrow-down-circle text-success"></i><span>Total income</span><strong>{{ summary.total_income | inr }}</strong></li>
+          <li><i class="bi bi-arrow-up-circle text-danger"></i><span>Total expenses</span><strong>{{ summary.total_expense | inr }}</strong></li>
+          <li><i class="bi bi-calendar-check text-primary"></i><span>{{ summary.month_label }} balance</span><strong>{{ summary.month_balance | inr }}</strong></li>
+        </ul>
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('dashboard.home') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Back to dashboard
+          </a>
+          <form method="post" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+              <i class="bi bi-box-arrow-right me-1"></i> Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0">
+        <h3 class="h6 fw-semibold mb-0"><i class="bi bi-person-gear me-2 text-primary"></i>Profile details</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          {{ render_field(form.name, icon="bi-person") }}
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="profileEmail">Email address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control" id="profileEmail" value="{{ current_user.email }}" disabled>
+            </div>
+            <div class="form-text">Your email is used for login and cannot be changed in this version.</div>
+          </div>
+          {{ form.submit(class="btn btn-brand") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h3 class="h6 fw-semibold mb-0"><i class="bi bi-shield-lock me-2 text-danger"></i>Change password</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('auth.change_password') }}" novalidate>
+          {{ password_form.hidden_tag() }}
+          {{ render_field(password_form.current_password, icon="bi-key", placeholder="Your current password") }}
+          {{ render_field(password_form.new_password, icon="bi-key-fill", placeholder="At least 8 characters") }}
+          {{ render_field(password_form.confirm_password, icon="bi-key-fill", placeholder="Repeat the new password") }}
+          {{ password_form.submit(class="btn btn-outline-danger") }}
+        </form>
+        <div class="alert alert-light border mt-3 mb-0 small">
+          <i class="bi bi-info-circle me-1 text-primary"></i>
+          Passwords are stored as salted PBKDF2 hashes - even the database administrator cannot read them.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

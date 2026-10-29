@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}403 Forbidden - {{ APP_NAME }}{% endblock %}
+{% block body_class %}public-body error-body{% endblock %}
+
+{% block body %}
+<main class="error-page">
+  <div class="error-card">
+    <div class="error-code text-danger">403</div>
+    <h1 class="h4 fw-bold mb-2">Access denied</h1>
+    <p class="text-muted mb-3">
+      This record belongs to another account. SpendWise only allows you to view and change your
+      own transactions.
+    </p>
+    <p class="text-muted small">
+      If you believe this is a mistake, go back to your transaction history and open the record
+      again from there.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+      <a href="{{ url_for('transactions.index') }}" class="btn btn-brand">My transactions</a>
+      <a href="{{ url_for('dashboard.home') }}" class="btn btn-outline-secondary">Dashboard</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

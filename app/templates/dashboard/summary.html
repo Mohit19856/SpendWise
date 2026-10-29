@@ -1,0 +1,190 @@
+{% extends "base_app.html" %}
+
+{% block title %}Monthly Summary - {{ APP_NAME }}{% endblock %}
+{% block page_title %}Monthly Summary{% endblock %}
+{% block page_subtitle %}Income, expenses and category breakdown for a single month.{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <form method="get" class="row g-2 align-items-end">
+          <div class="col-6">
+            <label class="form-label fw-semibold mb-1" for="month">Month</label>
+            <select class="form-select" id="month" name="month">
+              {% for number, name in months %}
+                <option value="{{ number }}" {% if number == data.month %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold mb-1" for="year">Year</label>
+            <select class="form-select" id="year" name="year">
+              {% for y in years %}
+                <option value="{{ y }}" {% if y == data.year %}selected{% endif %}>{{ y }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-brand btn-sm mt-2">
+              <i class="bi bi-search me-1"></i> Show summary
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-md-7">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
+          <a class="btn btn-outline-secondary btn-sm"
+             href="{{ url_for('dashboard.summary', year=prev.year, month=prev.month) }}">
+            <i class="bi bi-chevron-left"></i> Previous
+          </a>
+          {% if not is_current_month %}
+            <a class="btn btn-outline-secondary btn-sm"
+               href="{{ url_for('dashboard.summary', year=next.year, month=next.month) }}">
+              Next <i class="bi bi-chevron-right"></i>
+            </a>
+          {% endif %}
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('dashboard.summary') }}">
+            <i class="bi bi-calendar-check me-1"></i> Current month
+          </a>
+          <a class="btn btn-brand btn-sm" href="{{ url_for('transactions.add') }}">
+            <i class="bi bi-plus-lg me-1"></i> Add transaction
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2 class="h5 fw-semibold mb-0">{{ data.month_label }}</h2>
+  <span class="text-muted small">
+    {{ data.start.strftime('%d %b %Y') }} - {{ data.end.strftime('%d %b %Y') }}
+  </span>
+</div>
+
+<div class="row g-3 g-lg-4 mb-4">
+  <div class="col-sm-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-arrow-down-circle"></i></div>
+      <span class="stat-label">Income</span>
+      <span class="stat-value text-success">{{ data.income | inr }}</span>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-arrow-up-circle"></i></div>
+      <span class="stat-label">Expenses</span>
+      <span class="stat-value text-danger">{{ data.expense | inr }}</span>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-wallet2"></i></div>
+      <span class="stat-label">Savings / balance</span>
+      <span class="stat-value {{ 'text-success' if data.balance >= 0 else 'text-danger' }}">{{ data.balance | inr }}</span>
+    </div>
+  </div>
+</div>
+
+{% if not transactions %}
+  <div class="card border-0 shadow-sm empty-state">
+    <div class="card-body text-center py-5">
+      <span class="empty-icon"><i class="bi bi-calendar2-x"></i></span>
+      <h3 class="h6 fw-semibold mt-3">No transactions in {{ data.month_label }}</h3>
+      <p class="text-muted mb-4">Nothing was recorded in this month. Try another month or add a transaction.</p>
+      <a href="{{ url_for('transactions.add') }}" class="btn btn-brand">
+        <i class="bi bi-plus-lg me-1"></i> Add transaction
+      </a>
+    </div>
+  </div>
+{% else %}
+  <div class="row g-3 g-lg-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0">
+          <h3 class="h6 fw-semibold mb-0">Transactions in {{ data.month_label }} ({{ transactions|length }})</h3>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th class="text-end">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for txn in transactions %}
+                  <tr>
+                    <td class="text-nowrap small text-muted">{{ txn.txn_date.strftime('%d %b') }}</td>
+                    <td>
+                      <a href="{{ url_for('transactions.detail', txn_id=txn.id) }}" class="text-decoration-none">
+                        {{ txn.description or txn.category }}
+                      </a>
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ txn.category }}</span></td>
+                    <td class="text-end fw-semibold {{ 'text-success' if txn.is_income else 'text-danger' }}">
+                      {{ '+' if txn.is_income else '-' }}{{ txn.amount_paise | inr }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white border-0">
+          <h3 class="h6 fw-semibold mb-0">Expense categories</h3>
+        </div>
+        <div class="card-body">
+          {% if breakdown %}
+            <ul class="legend-list mb-0">
+              {% for item in breakdown %}
+                <li>
+                  <span class="legend-dot" style="background: {{ item.color }}"></span>
+                  <span class="legend-name">{{ item.category }}</span>
+                  <span class="legend-value">{{ item.amount | inr }}</span>
+                  <span class="legend-percent">{{ item.percentage }}%</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted small mb-0">No expenses recorded in this month.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h3 class="h6 fw-semibold mb-0">Income sources</h3>
+        </div>
+        <div class="card-body">
+          {% if income_breakdown %}
+            <ul class="legend-list mb-0">
+              {% for item in income_breakdown %}
+                <li>
+                  <span class="legend-dot" style="background: {{ item.color }}"></span>
+                  <span class="legend-name">{{ item.category }}</span>
+                  <span class="legend-value">{{ item.amount | inr }}</span>
+                  <span class="legend-percent">{{ item.percentage }}%</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted small mb-0">No income recorded in this month.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

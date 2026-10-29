@@ -1,0 +1,89 @@
+{% extends "base_app.html" %}
+
+{% block title %}Transaction #{{ transaction.id }} - {{ APP_NAME }}{% endblock %}
+{% block page_title %}Transaction Details{% endblock %}
+{% block page_subtitle %}Record #{{ transaction.id }} of {{ current_user.email }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+          <div>
+            <span class="badge bg-{{ TYPE_BADGES[transaction.type] }}-subtle text-{{ TYPE_BADGES[transaction.type] }}-emphasis mb-2">
+              {{ TYPE_LABELS[transaction.type] }}
+            </span>
+            <h2 class="h4 fw-bold mb-1">{{ transaction.description or transaction.category }}</h2>
+            <p class="text-muted mb-0">{{ transaction.txn_date.strftime('%d %B %Y') }}</p>
+          </div>
+          <div class="text-end">
+            <div class="display-6 fw-bold {{ 'text-success' if transaction.is_income else 'text-danger' }}">
+              {{ '+' if transaction.is_income else '-' }}{{ transaction.amount_paise | inr }}
+            </div>
+            <span class="text-muted small">{{ CURRENCY_SYMBOL }} INR</span>
+          </div>
+        </div>
+
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Transaction ID</dt>
+          <dd class="col-sm-8">#{{ transaction.id }}</dd>
+
+          <dt class="col-sm-4 text-muted">Type</dt>
+          <dd class="col-sm-8">{{ TYPE_LABELS[transaction.type] }}</dd>
+
+          <dt class="col-sm-4 text-muted">Category</dt>
+          <dd class="col-sm-8"><span class="badge bg-light text-dark border">{{ transaction.category }}</span></dd>
+
+          <dt class="col-sm-4 text-muted">Amount</dt>
+          <dd class="col-sm-8">{{ transaction.amount_paise | inr }} ({{ transaction.amount_paise }} paise)</dd>
+
+          <dt class="col-sm-4 text-muted">Description</dt>
+          <dd class="col-sm-8">{{ transaction.description or '-' }}</dd>
+
+          <dt class="col-sm-4 text-muted">Transaction date</dt>
+          <dd class="col-sm-8">{{ transaction.txn_date.strftime('%d %b %Y') }}</dd>
+
+          <dt class="col-sm-4 text-muted">Created at</dt>
+          <dd class="col-sm-8">{{ transaction.created_at.strftime('%d %b %Y, %H:%M') }} UTC</dd>
+        </dl>
+      </div>
+
+      <div class="card-footer bg-white border-0 d-flex flex-wrap gap-2 p-4 pt-0">
+        <a href="{{ url_for('transactions.edit', txn_id=transaction.id) }}" class="btn btn-brand">
+          <i class="bi bi-pencil me-1"></i> Edit transaction
+        </a>
+        <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to history
+        </a>
+        <form method="post" action="{{ url_for('transactions.delete', txn_id=transaction.id) }}"
+              class="ms-auto" onsubmit="return confirm('Delete this transaction permanently?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline-danger">
+            <i class="bi bi-trash me-1"></i> Delete
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h2 class="h6 fw-semibold mb-0"><i class="bi bi-shield-check me-2 text-success"></i>Ownership check</h2>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">
+          SpendWise looks up this record by its ID <em>and</em> verifies that it belongs to the
+          logged-in account before showing anything.
+        </p>
+        <ul class="ownership-list list-unstyled mb-0 small">
+          <li><i class="bi bi-check2-circle text-success"></i> Owner: <strong>{{ current_user.email }}</strong></li>
+          <li><i class="bi bi-check2-circle text-success"></i> Record user_id: <strong>{{ transaction.user_id }}</strong></li>
+          <li><i class="bi bi-check2-circle text-success"></i> Session user id: <strong>{{ current_user.id }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

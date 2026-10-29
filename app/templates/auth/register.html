@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "partials/field.html" import render_field with context %}
+
+{% block title %}Create Account - {{ APP_NAME }}{% endblock %}
+{% block body_class %}public-body{% endblock %}
+
+{% block body %}
+{% include "partials/public_nav.html" %}
+
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7 col-xl-6">
+      {% include "partials/flashes.html" %}
+
+      <div class="card auth-card border-0 shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <span class="auth-icon"><i class="bi bi-person-plus"></i></span>
+            <h1 class="h3 fw-bold mt-3 mb-1">Create your account</h1>
+            <p class="text-muted mb-0">Free, takes less than a minute.</p>
+          </div>
+
+          <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            {{ render_field(form.name, icon="bi-person", placeholder="Your full name") }}
+            {{ render_field(form.email, icon="bi-envelope", placeholder="you@example.com", help_text="Used only for login. Must be unique.") }}
+            {{ render_field(form.password, icon="bi-key", placeholder="At least 8 characters") }}
+            {{ render_field(form.confirm_password, icon="bi-key-fill", placeholder="Repeat your password") }}
+            <div class="d-grid mt-2">
+              {{ form.submit(class="btn btn-brand btn-lg") }}
+            </div>
+          </form>
+
+          <div class="alert alert-light border mt-4 mb-0 small">
+            <i class="bi bi-info-circle me-1 text-primary"></i>
+            Your password is stored as a secure hash. SpendWise never saves the plain password.
+          </div>
+
+          <p class="text-center text-muted mt-3 mb-0">
+            Already registered?
+            <a href="{{ url_for('auth.login') }}" class="fw-semibold text-decoration-none">Log in here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

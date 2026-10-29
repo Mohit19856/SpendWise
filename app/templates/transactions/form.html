@@ -1,0 +1,110 @@
+{% extends "base_app.html" %}
+{% from "partials/field.html" import render_field, render_select with context %}
+
+{% block title %}{{ 'Edit Transaction' if mode == 'edit' else 'Add Transaction' }} - {{ APP_NAME }}{% endblock %}
+{% block page_title %}{{ 'Edit Transaction' if mode == 'edit' else 'Add Transaction' }}{% endblock %}
+{% block page_subtitle %}
+  {% if mode == 'edit' %}
+    Update the details of transaction #{{ transaction.id }}.
+  {% else %}
+    Record a new income or expense in {{ CURRENCY_SYMBOL }} (INR).
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h2 class="h6 fw-semibold mb-0">
+          <i class="bi {{ 'bi-pencil-square' if mode == 'edit' else 'bi-plus-circle' }} me-2 text-primary"></i>
+          Transaction details
+        </h2>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate id="transactionForm">
+          {{ form.hidden_tag() }}
+
+          {{ render_select(form.type, icon="bi-arrow-left-right") }}
+          {{ render_field(form.amount, icon="bi-currency-rupee", placeholder="0.00",
+                          help_text="Enter a positive amount, for example 250.50") }}
+
+          <div class="mb-3">
+            {{ form.category.label(class="form-label fw-semibold") }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tags"></i></span>
+              <select class="form-select {% if form.category.errors %}is-invalid{% endif %}"
+                      id="category" name="category">
+                <optgroup label="Income categories" data-type="income">
+                  {% for category in INCOME_CATEGORIES %}
+                    <option value="{{ category }}" {% if form.category.data == category %}selected{% endif %}>{{ category }}</option>
+                  {% endfor %}
+                </optgroup>
+                <optgroup label="Expense categories" data-type="expense">
+                  {% for category in EXPENSE_CATEGORIES %}
+                    <option value="{{ category }}" {% if form.category.data == category %}selected{% endif %}>{{ category }}</option>
+                  {% endfor %}
+                </optgroup>
+              </select>
+              {% for error in form.category.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="form-text">The list changes automatically with the transaction type.</div>
+          </div>
+
+          {{ render_field(form.txn_date, icon="bi-calendar3") }}
+          {{ render_field(form.description, icon="bi-card-text",
+                          placeholder="e.g. Monthly grocery shopping",
+                          help_text="Optional. Maximum 255 characters.") }}
+
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            {{ form.submit(class="btn btn-brand") }}
+            {% if mode == 'edit' %}
+              <a href="{{ url_for('transactions.detail', txn_id=transaction.id) }}" class="btn btn-outline-secondary">Cancel</a>
+            {% else %}
+              <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary">Cancel</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-0">
+        <h2 class="h6 fw-semibold mb-0"><i class="bi bi-lightbulb me-2 text-warning"></i>Tips</h2>
+      </div>
+      <div class="card-body">
+        <ul class="tip-list mb-0">
+          <li>Choose <strong>Income</strong> for money you receive and <strong>Expense</strong> for money you spend.</li>
+          <li>Pick the category that best describes the transaction so the charts stay meaningful.</li>
+          <li>Amounts are stored safely as paise (integers), so there is no rounding error.</li>
+          <li>Use a clear description - you can search for it later.</li>
+        </ul>
+      </div>
+    </div>
+
+    {% if mode == 'edit' %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h2 class="h6 fw-semibold mb-0">Record info</h2>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-0 small">
+            <dt class="col-5 text-muted">Transaction ID</dt><dd class="col-7">#{{ transaction.id }}</dd>
+            <dt class="col-5 text-muted">Recorded on</dt>
+            <dd class="col-7">{{ transaction.created_at.strftime('%d %b %Y, %H:%M') }} UTC</dd>
+            <dt class="col-5 text-muted">Owner</dt><dd class="col-7">{{ current_user.email }}</dd>
+          </dl>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}

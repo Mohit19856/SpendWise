@@ -1,0 +1,219 @@
+{% extends "base_app.html" %}
+
+{% block title %}Transactions - {{ APP_NAME }}{% endblock %}
+{% block page_title %}Transaction History{% endblock %}
+{% block page_subtitle %}Filter, search and manage your income and expense records.{% endblock %}
+
+{% block content %}
+{# --------------------------- Filters --------------------------- #}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" action="{{ url_for('transactions.index') }}" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label fw-semibold mb-1" for="type">Type</label>
+        <select class="form-select" id="type" name="type">
+          <option value="">All types</option>
+          {% for value in txn_types %}
+            <option value="{{ value }}" {% if filters.type == value %}selected{% endif %}>{{ value|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label fw-semibold mb-1" for="category">Category</label>
+        <select class="form-select" id="category" name="category">
+          <option value="">All categories</option>
+          {% for category in categories %}
+            <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label fw-semibold mb-1" for="date_from">From date</label>
+        <input type="date" class="form-control" id="date_from" name="date_from" value="{{ filters.date_from }}">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label fw-semibold mb-1" for="date_to">To date</label>
+        <input type="date" class="form-control" id="date_to" name="date_to" value="{{ filters.date_to }}">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label fw-semibold mb-1" for="q">Search</label>
+        <input type="search" class="form-control" id="q" name="q"
+               value="{{ filters.q }}" placeholder="Description...">
+      </div>
+
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-brand btn-sm">
+          <i class="bi bi-funnel me-1"></i> Apply filters
+        </button>
+        {% if has_filters %}
+          <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x-circle me-1"></i> Clear filters
+          </a>
+        {% endif %}
+        <a href="{{ url_for('transactions.add') }}" class="btn btn-outline-primary btn-sm ms-auto">
+          <i class="bi bi-plus-lg me-1"></i> Add transaction
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if transactions %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <p class="text-muted small mb-0">
+      Showing <strong>{{ transactions|length }}</strong> of
+      <strong>{{ pagination.total }}</strong> matching transactions
+      {% if pagination.pages > 1 %}(page {{ pagination.page }} of {{ pagination.pages }}){% endif %}.
+    </p>
+    <p class="small mb-0">
+      <span class="text-success fw-semibold">Income: {{ page_income | inr }}</span>
+      <span class="text-muted mx-1">|</span>
+      <span class="text-danger fw-semibold">Expenses: {{ page_expense | inr }}</span>
+      <span class="text-muted">(this page)</span>
+    </p>
+  </div>
+{% endif %}
+
+{# --------------------------- Table --------------------------- #}
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if transactions %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:60px;">#</th>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th class="text-end">Amount</th>
+              <th class="text-end" style="width:150px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for txn in transactions %}
+              <tr>
+                <td class="text-muted small">{{ txn.id }}</td>
+                <td class="text-nowrap small">{{ txn.txn_date.strftime('%d %b %Y') }}</td>
+                <td>
+                  <a href="{{ url_for('transactions.detail', txn_id=txn.id) }}" class="text-decoration-none fw-medium">
+                    {{ txn.description or '-' }}
+                  </a>
+                </td>
+                <td><span class="badge bg-light text-dark border">{{ txn.category }}</span></td>
+                <td>
+                  <span class="badge bg-{{ TYPE_BADGES[txn.type] }}-subtle text-{{ TYPE_BADGES[txn.type] }}-emphasis">
+                    {{ TYPE_LABELS[txn.type] }}
+                  </span>
+                </td>
+                <td class="text-end fw-semibold {{ 'text-success' if txn.is_income else 'text-danger' }}">
+                  {{ '+' if txn.is_income else '-' }}{{ txn.amount_paise | inr }}
+                </td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{{ url_for('transactions.detail', txn_id=txn.id) }}"
+                       class="btn btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                    <a href="{{ url_for('transactions.edit', txn_id=txn.id) }}"
+                       class="btn btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <button type="button" class="btn btn-outline-danger" title="Delete"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            data-delete-url="{{ url_for('transactions.delete', txn_id=txn.id) }}"
+                            data-delete-label="{{ txn.category }} - {{ txn.amount_paise | inr }}">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center py-5 empty-state">
+        <span class="empty-icon"><i class="bi bi-search"></i></span>
+        <h3 class="h6 fw-semibold mt-3">
+          {% if has_filters %}No transactions match your filters{% else %}No transactions yet{% endif %}
+        </h3>
+        <p class="text-muted mb-4">
+          {% if has_filters %}
+            Try changing the type, category, date range or search text.
+          {% else %}
+            Start by adding your first income or expense record.
+          {% endif %}
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          {% if has_filters %}
+            <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle me-1"></i> Clear filters
+            </a>
+          {% endif %}
+          <a href="{{ url_for('transactions.add') }}" class="btn btn-brand">
+            <i class="bi bi-plus-lg me-1"></i> Add transaction
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if pagination and pagination.pages > 1 %}
+    <div class="card-footer bg-white border-0 d-flex justify-content-center">
+      <nav aria-label="Transaction pages">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('transactions.index', page=pagination.prev_num, **filters) }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          {% for page_number in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_number %}
+              <li class="page-item {% if page_number == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('transactions.index', page=page_number, **filters) }}">{{ page_number }}</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+          {% endfor %}
+          <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('transactions.index', page=pagination.next_num, **filters) }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  {% endif %}
+</div>
+
+{# --------------------------- Delete confirmation --------------------------- #}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-danger-subtle">
+        <h5 class="modal-title text-danger-emphasis"><i class="bi bi-exclamation-triangle me-2"></i>Delete transaction</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">Are you sure you want to delete this transaction?</p>
+        <p class="fw-semibold mb-0" id="deleteTargetLabel"></p>
+        <p class="text-muted small mb-0 mt-2">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" id="deleteForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Yes, delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}
